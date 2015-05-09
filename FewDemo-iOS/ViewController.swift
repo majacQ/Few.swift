@@ -47,13 +47,42 @@ private func renderRow(row: Int) -> Element {
             ])
 }
 
-func renderTableView(component: Component<()>, state: ()) -> Element {
-	return TableView((1...100).map(renderRow), selectionChanged: println)
-		.flex(1)
-		.selfAlignment(.Stretch)
+struct TableViewState {
+	let headerHeight: CGFloat
+	let headerImage: UIImage
 }
 
-let TableViewDemo = { Component(initialState: (), render: renderTableView) }
+func renderTableView(component: Component<TableViewState>, state: TableViewState) -> Element {
+	let header = Image(state.headerImage)
+		.size(0, state.headerHeight)
+		.selfAlignment(.FlexStart)
+	let tv = TableView((1...100).map(renderRow),
+		header: header,
+		selectionChanged: println)
+			.flex(1)
+			.selfAlignment(.Stretch)
+	return tv
+}
+
+let TableViewDemo: () -> Component<TableViewState> = {
+	let component = Component(initialState: TableViewState(headerHeight: 42, headerImage: UIImage(named: "Apple_Swift_Logo.png")!), render: renderTableView)
+	dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(NSEC_PER_SEC * 2)), dispatch_get_main_queue()) {
+		component.updateState { oldState in
+			return TableViewState(headerHeight: oldState.headerHeight + 20, headerImage: oldState.headerImage)
+		}
+	}
+	dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(NSEC_PER_SEC * 5)), dispatch_get_main_queue()) {
+		component.updateState { oldState in
+			return TableViewState(headerHeight: oldState.headerHeight, headerImage: UIImage())
+		}
+	}
+	dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(NSEC_PER_SEC * 8)), dispatch_get_main_queue()) {
+		component.updateState { oldState in
+			return TableViewState(headerHeight: 0, headerImage: UIImage())
+		}
+	}
+	return component
+}
 
 func renderInput(component: Component<String>, state: String) -> Element {
     return View(backgroundColor: UIColor.greenColor())
@@ -71,7 +100,7 @@ func renderInput(component: Component<String>, state: String) -> Element {
 let InputDemo = { Component(initialState: "", render: renderInput) }
 
 struct AppState {
-    let tableViewComponent: Component<()>
+    let tableViewComponent: Component<TableViewState>
     let counterComponent: Component<Int>
     let inputComponent: Component<String>
     

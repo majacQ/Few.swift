@@ -626,6 +626,7 @@
 					};
 					A2FA88DF1AB33B4000561FBF = {
 						CreatedOnToolsVersion = 6.2;
+						DevelopmentTeam = 79SFWPS5TA;
 					};
 				};
 			};
