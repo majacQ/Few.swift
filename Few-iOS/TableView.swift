@@ -269,6 +269,7 @@ public class TableView: Element {
 			handler.selectionChanged = selectionChanged
 			let tableSelected = tableView.indexPathForSelectedRow()
 			if tableSelected != selectedRow {
+				tableView.layoutIfNeeded()
 				if let selectedRow = selectedRow {
 					tableView.selectRowAtIndexPath(selectedRow, animated: false, scrollPosition: .None)
 				} else if let tableSelected = tableSelected {
