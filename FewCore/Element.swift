@@ -107,18 +107,21 @@ public class Element {
 			println("*** Diffing \(self)")
 		}
 
-		let view = realizedSelf?.view
-		if hidden != old.hidden {
-			view?.hidden = hidden
-		}
-
-		if let view = view {
-			compareAndSetAlpha(view, alpha)
-		}
-
-		realizedSelf?.element = self
-
 		if let realizedSelf = realizedSelf {
+			realizedSelf.element = self
+			
+			if let view = realizedSelf.view {
+				if hidden != view.hidden {
+					view.hidden = hidden
+				}
+				
+				compareAndSetAlpha(view, alpha)
+			}
+			
+			if old.frame.size != frame.size && !frame.size.isUndefined {
+				realizedSelf.markNeedsLayout()
+			}
+			
 			let childrenDiff = diffElementLists(realizedSelf.children, children)
 
 			if LogDiff {
